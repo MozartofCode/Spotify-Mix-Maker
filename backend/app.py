@@ -5,6 +5,7 @@
 
 # Import necessary modules
 import requests
+from flask import request
 from flask import Flask, jsonify
 from flask_cors import CORS
 import base64
@@ -23,10 +24,23 @@ client_id = ""
 client_secret = ""
 
 # Credentials for MangoDB
-mango_username = ""
-mango_password = ""
-mango_cluster = ""
+mongo_username = ""
+mongo_password = ""
+mongo_cluster = ""
 
+
+uri = "mongodb+srv://" + mongo_username + ":" + mongo_password + "@" + mongo_cluster + ".i73vml1.mongodb.net/?retryWrites=true&w=majority"
+
+# Create a new client and connect to the server
+client = MongoClient(uri, tlsCAFile=certifi.where())
+
+# Send a ping to confirm a successful connection
+try:
+    client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+
+except Exception as e:
+    print(e)
 
 
 
@@ -61,31 +75,95 @@ def initialization():
 #initialization()
 
 
-def connect_mangoDB():
-
-    uri = "mongodb+srv://" + mango_username + ":" + mango_password + "@" + mango_cluster + ".i73vml1.mongodb.net/?retryWrites=true&w=majority"
-
-    # Create a new client and connect to the server
-    client = MongoClient(uri, tlsCAFile=certifi.where())
-
-    # Send a ping to confirm a successful connection
-    try:
-        client.admin.command('ping')
-        print("Pinged your deployment. You successfully connected to MongoDB!")
-    except Exception as e:
-        print(e)
 
 
-connect_mangoDB()
 
-@app.route('/api/login', methods=['GET'])
-def login(username, password):
-    return
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    
+    # Extract username and password from the request body
+    data = request.json
+
+    # Check if 'data' is present and has the required fields
+    if not data or 'username' not in data or 'password' not in data:
+        return jsonify({'error': 'Invalid request data'}), 400
+
+    username = data['username']
+    password = data['password']
+
+    # Create or access a database
+    db = client["users"]
+
+    # Create or access a collection
+    users = db["users"]
+
+
+    # Check if the username already exists
+    existing_user = users.find_one({'username': username, 'password': password})
+
+    if existing_user:
+        return jsonify({'message': 'User logged-in successfully'})    
+    
+    return jsonify({'message': "User doesn't exist or incorrrect credentials"})
+
+
 
 
 @app.route('/api/register', methods=['POST'])
-def register(username, password):
-    return
+def register():
+    
+    # Extract username and password from the request body
+    data = request.json
+
+    # Check if 'data' is present and has the required fields
+    if not data or 'username' not in data or 'password' not in data:
+        return jsonify({'error': 'Invalid request data'}), 400
+
+    username = data['username']
+    password = data['password']
+
+
+    # Create or access a database
+    db = client["users"]
+
+    # Create or access a collection
+    users = db["users"]
+
+
+    # Check if the username already exists
+    existing_user = users.find_one({'username': username, 'password': password})
+
+    if existing_user:
+        return jsonify({'error': 'Username already exists'}), 400
+
+    # Insert the new user into the 'users' collection
+    new_user = {'username': username, 'password': password}
+    users.insert_one(new_user)
+
+    return jsonify({'message': 'User registered successfully'})    
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## there has to be some sort of a search logic or like send a message to the user logic or smth?
