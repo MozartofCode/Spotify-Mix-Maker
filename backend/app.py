@@ -10,13 +10,14 @@ from flask_cors import CORS
 import base64
 
 
+
 # Create a Flask app
 app = Flask(__name__)
 CORS(app)
 
 
-client_id = "1451cdd63e324f46ac0db9da993cfb58"
-client_secret = "55ee865120cf4a9689727db6b80ebb3a"
+client_id = ""
+client_secret = ""
 
 
 def initialization():
