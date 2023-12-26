@@ -10,10 +10,10 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 import base64
 from pymongo import MongoClient
-import json
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import certifi
+import json
 
 # Create a Flask app
 app = Flask(__name__)
