@@ -8,16 +8,26 @@ import requests
 from flask import Flask, jsonify
 from flask_cors import CORS
 import base64
-
-
+from pymongo import MongoClient
+import json
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+import certifi
 
 # Create a Flask app
 app = Flask(__name__)
 CORS(app)
 
-
+# Credentials for Spotify
 client_id = ""
 client_secret = ""
+
+# Credentials for MangoDB
+mango_username = ""
+mango_password = ""
+mango_cluster = ""
+
+
 
 
 def initialization():
@@ -48,13 +58,25 @@ def initialization():
         print(response.text)
 
 
-initialization()
+#initialization()
 
 
+def connect_mangoDB():
+
+    uri = "mongodb+srv://" + mango_username + ":" + mango_password + "@" + mango_cluster + ".i73vml1.mongodb.net/?retryWrites=true&w=majority"
+
+    # Create a new client and connect to the server
+    client = MongoClient(uri, tlsCAFile=certifi.where())
+
+    # Send a ping to confirm a successful connection
+    try:
+        client.admin.command('ping')
+        print("Pinged your deployment. You successfully connected to MongoDB!")
+    except Exception as e:
+        print(e)
 
 
-
-
+connect_mangoDB()
 
 @app.route('/api/login', methods=['GET'])
 def login(username, password):
