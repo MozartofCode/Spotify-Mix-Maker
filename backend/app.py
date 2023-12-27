@@ -146,8 +146,6 @@ def register():
 
 
 
-
-
 @app.route('/api/search', methods = ['GET'])
 def search_album():
     
@@ -189,18 +187,65 @@ def search_album():
     
 
 
-@app.route('/api/send/Album', methods=['POST'])
-def send_album():
+@app.route('/api/getTracks', methods= ['GET'])
+def get_track():
+    
+    data = request.args
+    
+    if not data or 'query' not in data:
+        return jsonify({'error': 'Invalid request data'}), 404
+    
+    access_token = connect_spotifyAPI()
+
+    if not access_token:
+        return jsonify({'error': 'Failed to obtain access token from Spotify API'})
+    
+    id = data['query']
+
+    spotify_search_track_url = f'https://api.spotify.com/v1/albums/{id}/tracks'
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+    }
+    params = {
+        'limit': 50
+    }
+    
+    try:
+        response = requests.get(spotify_search_track_url, headers=headers, params=params)
+        response.raise_for_status()
+
+        
+        # Print request details for debugging
+        print('Request URL:', response.url)
+        print('Request Headers:', response.request.headers)
+        print('Request Params:', response.request.params)
+
+
+
+        data = response.json()
+
+        tracks = [item['name'] for item in data.get('items', [])]
+
+        return jsonify(results=tracks)
+    
+    except requests.RequestException as e:
+        return jsonify(error = str(e)), 500
+
+
+
+
+@app.route('/api/sendRequest', methods=['POST'])
+def send_request():
 
     data = request.json
 
     # Check if 'data' is present and has the required fields
-    if not data or 'username' not in data or 'friend' not in data or 'albumID' not in data:
+    if not data or 'username' not in data or 'friend' not in data or 'album' not in data:
         return jsonify({'error': 'Invalid request data'}), 404
 
     username = data['username']
     friend = data['friend']
-    albumID = data['albumID']
+    albumID = data['album']
 
     # Create or access a database   
     client = connect_mongoDB()
@@ -214,3 +259,8 @@ def send_album():
     users.insert_one(new_user)
 
     return jsonify({'message': 'User registered successfully'})    
+
+
+@app.route('/api/acceptRequest')
+def accept_request():
+    return

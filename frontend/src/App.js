@@ -36,7 +36,7 @@ const App = () => {
     }
 
     else {
-      alert("Registeration successful!");
+      alert("Registration successful!");
     }
     
   };
