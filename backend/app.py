@@ -20,8 +20,8 @@ app = Flask(__name__)
 CORS(app)
 
 # Credentials for Spotify
-client_id = ""
-client_secret = ""
+client_id = "1451cdd63e324f46ac0db9da993cfb58"
+client_secret = "55ee865120cf4a9689727db6b80ebb3a"
 
 # Credentials for MangoDB
 mongo_username = "newMangoUser"
@@ -81,7 +81,6 @@ def login():
 @app.route('/api/register', methods=['POST'])
 def register():
     
-    print("Received register request")
     # Extract username and password from the request body
     data = request.json
 
@@ -116,7 +115,55 @@ def register():
     return jsonify({'message': 'User registered successfully'})    
 
 
-## there has to be some sort of a search logic or like send a message to the user logic or smth?
+
+
+
+@app.route('/api/search/Album', methods = ['GET'])
+def search_album():
+    
+    
+    
+    
+    return
+
+
+
+
+
+
+
+
+
+@app.route('/api/send/Album', methods=['POST'])
+def send_album():
+
+    data = request.json
+
+    # Check if 'data' is present and has the required fields
+    if not data or 'username' not in data or 'friend' not in data or 'albumID' not in data:
+        return jsonify({'error': 'Invalid request data'}), 404
+
+    username = data['username']
+    friend = data['friend']
+    albumID = data['albumID']
+
+    # Create or access a database   
+    client = connect_mongoDB()
+    db = client["users"]
+
+    # Create or access a collection
+    users = db["mixtapes"]
+
+    # Insert the new user into the 'users' collection
+    new_user = {'username': username, 'friend': friend, 'albumID': albumID}
+    users.insert_one(new_user)
+
+    return jsonify({'message': 'User registered successfully'})    
+
+
+
+
+
 
 
 

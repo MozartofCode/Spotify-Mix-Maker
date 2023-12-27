@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import Home from './home';
+import Swap from './Swap';
+
 import { 
   BrowserRouter,
   Routes,
@@ -15,6 +17,7 @@ root.render(
     <Routes>
     <Route path= "/" element={<App />} />
     <Route path= "home" element={<Home />} />
+    <Route path= "Swap" element = {<Swap />} />
     <Route
       path="*"
       element={
