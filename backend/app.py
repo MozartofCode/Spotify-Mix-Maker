@@ -24,9 +24,9 @@ client_id = ""
 client_secret = ""
 
 # Credentials for MangoDB
-mongo_username = ""
-mongo_password = ""
-mongo_cluster = ""
+mongo_username = "newMangoUser"
+mongo_password = "MkqL4Dw0gOvQIC88"
+mongo_cluster = "spotify-mix-cluster"
 
 def connect_mongoDB():
     
@@ -73,7 +73,7 @@ def login():
     if existing_user:
         return jsonify({'message': 'User logged-in successfully'})    
     
-    return jsonify({'message': "User doesn't exist or incorrrect credentials"})
+    return jsonify({'message': "User doesn't exist or incorrrect credentials"}), 400
 
 
 

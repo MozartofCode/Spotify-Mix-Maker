@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import './App.css';
+import axios from 'axios';
+import { useNavigate} from 'react-router-dom';
+
 
 const App = () => {
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleUsernameChange = (e) => {
     setUsername(e.target.value);
@@ -48,16 +52,17 @@ const App = () => {
       body: JSON.stringify({ username, password }),
     });
 
-    if (response.status === 404) {
+    if (response.status === 404 || response.status === 400) {
       alert("User not found! Try again or register if you are a new user...");
     }
 
     else {
       const data = await response.json();  
       console.log(data);
+
+      navigate('/Home');
+
     }
-
-
 
   };
 
