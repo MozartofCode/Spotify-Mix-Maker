@@ -28,6 +28,36 @@ mongo_username = "newMangoUser"
 mongo_password = "MkqL4Dw0gOvQIC88"
 mongo_cluster = "spotify-mix-cluster"
 
+
+
+
+def connect_spotifyAPI():
+
+    auth_url = 'https://accounts.spotify.com/api/token'
+
+    auth_headers = {
+        'Authorization': 'Basic ' + base64.b64encode((client_id + ':' + client_secret).encode()).decode('utf-8')
+    }
+
+    auth_data = {
+        'grant_type': 'client_credentials'
+    }
+
+    response = requests.post(auth_url, headers=auth_headers, data=auth_data)
+
+    if response.status_code == 200:
+        body = response.json()
+        token = body.get('access_token')
+        return token
+    
+    else:
+        print(f'Error: {response.status_code}')
+        print(response.text)
+
+
+
+
+
 def connect_mongoDB():
     
     uri = "mongodb+srv://" + mongo_username + ":" + mongo_password + "@" + mongo_cluster + ".i73vml1.mongodb.net/?retryWrites=true&w=majority"
@@ -118,20 +148,40 @@ def register():
 
 
 
-@app.route('/api/search/Album', methods = ['GET'])
+@app.route('/api/search', methods = ['GET'])
 def search_album():
     
+    data = request.args
+
+    if not data or 'query' not in data:
+        return jsonify({'error': 'Invalid request data'}), 404
     
+    access_token = connect_spotifyAPI()
+
+    if not access_token:
+        return jsonify({'error': 'Failed to obtain access token from Spotify API'})
     
+    query = data['query']
+
+    spotify_search_url = 'https://api.spotify.com/v1/search'
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+    }
+    params = {
+        'q': query,
+        'type': 'album',
+    }
     
-    return
-
-
-
-
-
-
-
+    try:
+        response = requests.get(spotify_search_url, headers=headers, params=params)
+        response.raise_for_status()
+        data = response.json()
+        results = data.get('albums', {}).get('items', [])
+        return jsonify(results=results)
+    
+    except requests.RequestException as e:
+        return jsonify(error = str(e)), 500
+    
 
 
 @app.route('/api/send/Album', methods=['POST'])
@@ -159,87 +209,3 @@ def send_album():
     users.insert_one(new_user)
 
     return jsonify({'message': 'User registered successfully'})    
-
-
-
-
-
-
-
-
-# def initialization():
-
-#     auth_url = 'https://accounts.spotify.com/api/token'
-
-#     auth_headers = {
-#         'Authorization': 'Basic ' + base64.b64encode((client_id + ':' + client_secret).encode()).decode('utf-8')
-#     }
-
-#     auth_data = {
-#         'grant_type': 'client_credentials'
-#     }
-
-#     response = requests.post(auth_url, headers=auth_headers, data=auth_data)
-
-#     if response.status_code == 200:
-#         body = response.json()
-#         token = body.get('access_token')
-#         token_type = body.get('token_type')
-#         expires_in = body.get('expires_in')
-#         # print(f'Token: {token}')
-#         # print(f'Token Type: {token_type}')
-#         # print(f'Expires in: {expires_in}')
-        
-#     else:
-#         print(f'Error: {response.status_code}')
-#         print(response.text)
-
-
-# #initialization()
-
-
-
-# # Define a route to handle GET requests to '/'
-# @app.route('/api/getPlaylist', methods=['GET'])
-# def get_playlist(playlist_name):
-#     return
-
-
-
-
-
-# # Define a route to handle GET requests to '/'
-# # Add this song
-# @app.route('/api/swipeRight', methods=['GET'])
-# def swipe_right():    
-#     return
-
-
-# # Define a route to handle GET requests to '/'
-# # Don't add this song
-# @app.route('/api/swipeLeft', methods=['GET'])
-# def swipe_left():
-#     return
-
-
-# # Define a route to handle GET requests to '/'
-# # Don't add this song
-# @app.route('/api/mix', methods=['GET'])
-# def make_mix():
-#     return
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
