@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import Home from './home';
 import Swap from './Swap';
+import Message from './Message';
 
 import { 
   BrowserRouter,
@@ -18,6 +19,7 @@ root.render(
     <Route path= "/" element={<App />} />
     <Route path= "home" element={<Home />} />
     <Route path= "Swap" element = {<Swap />} />
+    <Route path= "Message" element = {<Message />} />
     <Route
       path="*"
       element={

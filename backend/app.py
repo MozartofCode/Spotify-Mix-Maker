@@ -170,13 +170,18 @@ def search_album():
     params = {
         'q': query,
         'type': 'album',
+        'limit': 50
     }
     
     try:
         response = requests.get(spotify_search_url, headers=headers, params=params)
         response.raise_for_status()
         data = response.json()
-        results = data.get('albums', {}).get('items', [])
+        albums = data.get('albums', {}).get('items', [])
+        
+        # Extract relevant information (name and id) from each album
+        results = [{'name': album['name'], 'id': album['id']} for album in albums]
+        
         return jsonify(results=results)
     
     except requests.RequestException as e:

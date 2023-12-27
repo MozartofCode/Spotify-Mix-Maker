@@ -13,6 +13,7 @@ const Home = ({ results }) => {
   return (
     <div>
       <h1>Spotify Album Search</h1>
+      <body>Let's find an album you want to mix with your friend!</body>
       <SearchBox onSearch={handleSearch} />
       <SearchResults results={searchResults} />
     </div>
