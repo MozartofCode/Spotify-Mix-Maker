@@ -24,9 +24,9 @@ client_id = ""
 client_secret = ""
 
 # Credentials for MangoDB
-mongo_username = "newMangoUser"
-mongo_password = "MkqL4Dw0gOvQIC88"
-mongo_cluster = "spotify-mix-cluster"
+mongo_username = ""
+mongo_password = ""
+mongo_cluster = ""
 
 def connect_mongoDB():
     
