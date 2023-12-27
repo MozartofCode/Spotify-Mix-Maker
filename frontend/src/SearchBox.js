@@ -1,14 +1,25 @@
 // SearchBox.js
 import React, { useState } from 'react';
-import axios from 'axios';
+
 
 const SearchBox = ({ onSearch }) => {
   const [query, setQuery] = useState('');
 
   const handleSearch = async () => {
     try {
-      const response = await axios.get(`/api/search?query=${query}`);
-      onSearch(response.data);
+      const response = await fetch(`http://localhost:5000/api/search?query=${query}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      onSearch(data.results); // Assuming the result structure is similar to your previous implementation
     } catch (error) {
       console.error('Error searching:', error);
     }

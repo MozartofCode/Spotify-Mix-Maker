@@ -2,6 +2,13 @@
 import React from 'react';
 
 const SearchResults = ({ results }) => {
+
+  if (!results) {
+    return (
+      <h1>ERRORRRR</h1>
+    );
+  }
+
   return (
     <ul>
       {results.map((result) => (
