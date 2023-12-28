@@ -5,6 +5,7 @@ const Home = () => {
     
     const [requests, setRequests] = useState([]);
     const [ownRequests, setOwnRequests] = useState([]);
+    const [completedRequests, setCompletedRequests] = useState([]);
     const navigate = useNavigate();
         
     const location = useLocation();
@@ -17,6 +18,22 @@ const Home = () => {
     
 
   useEffect(() => {
+
+    const fetchCompletedRequest = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/displayCompleted?username=${username}`);
+        const data = await response.json();
+
+        if (response.ok) {
+          setOwnRequests(data.requests);
+        } else {
+          console.error('Failed to fetch requests:', data.error);
+        }
+      } catch (error) {
+        console.error('Error fetching requests:', error);
+      }
+    };
+
 
     const fetchOwnRequest = async () => {
       try {
@@ -51,7 +68,10 @@ const Home = () => {
 
     fetchRequests();
     fetchOwnRequest();
+    fetchCompletedRequest();
   }, [username]);
+
+
 
   const handleAccept = async (albumID) => {
 
@@ -93,10 +113,33 @@ const Home = () => {
       alert("Request rejected...")
       window.location.reload();
     }
-
-
-
   };
+
+
+  const makeMixList = async (username, friend, likedSongs) => {
+    
+      // Make a POST request to register endpoint
+      const response = await fetch('http://localhost:5000/api/makeMixList', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({username, friend, likedSongs}),
+      });
+  
+      if (response.status === 400 || response.status === 404) {
+        alert("Couldn't make playlist. Try again");
+      }
+  
+      else {
+        navigate('../Mixed', {state: {username: username, friend: friend, likedSongs: likedSongs}});
+        alert("Congratulations! New Playlist has been created for you and your friend");
+      }
+  };
+    
+
+
+
 
   return (
     <div>
@@ -121,6 +164,21 @@ const Home = () => {
             <p>Status: {request.status}</p>
           </li>
         ))}
+      </ul>
+        
+        
+      <h2>Lists Ready for creating a mixed playlist!</h2>
+
+      <ul>
+        {completedRequests.map((request, index) => (
+            <li key={index}>
+              <p>Friend: {request.username}</p>
+              <p>Status: {request.status}</p>
+              <p>Songs: {request.likedSongs}</p>
+              <button onClick={() => makeMixList(request.username, request.friend, request.likedSongs)}>Make my mix list!</button>
+              
+            </li>
+          ))}
       </ul>
 
 

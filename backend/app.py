@@ -290,6 +290,44 @@ def display_other_requests():
 
 
 
+@app.route('/api/displayCompletedRequests', methods= ['GET'])
+def display_completed():
+
+    try:
+        
+        data = request.args
+      
+        if not data or 'username' not in data:
+            return jsonify({'error': 'Invalid request data'}), 404
+    
+        username = data['username']
+
+        # Connect to MongoDB
+        client = connect_mongoDB()
+        db = client["users"]
+        users = db["mixtapes"]
+
+        friend_requests = list(users.find({'friend': username, 'status': 'complete'}))
+        own_requests = list(users.find({'username': username, 'status': 'complete'}))
+
+        formatted_requests = []        
+
+        for own_req in own_requests:
+            for friend_req in friend_requests:
+                if own_req['friend'] == friend_req['username']:
+                    formatted_request = {
+                    'username': own_req['username'],
+                    'friend': own_req['friend'],
+                    'status': own_req['status'],
+                    'likedSong': own_req['likedSongs'] + friend_req['likedSongs'],
+                    }
+                    
+                    formatted_requests.append(formatted_request)
+
+        return jsonify(requests=formatted_requests)
+
+    except Exception as e:
+        return jsonify(error=str(e)), 500
 
 
 
@@ -465,5 +503,7 @@ def swipe_right():
 
 
 
-
+@app.route('/api/makeMixList', methods = ['POST'])
+def make_mixed_List():
+    return
 

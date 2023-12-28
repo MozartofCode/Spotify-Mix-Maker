@@ -6,6 +6,7 @@ import Search from './Search'; // Import your home component
 import Message from './Message'
 import Home from './Home'
 import Swap from './Swap'
+import Mixed from './Mixed'
 
 const Routes = () => {
   return (
@@ -16,6 +17,7 @@ const Routes = () => {
         <Route exact path="/home" component={Home} />
         <Route exact path="/Message" component={Message} />
         <Route exact path="/Swap" component={Swap} />
+        <Route exact path="/Mixed" component={Mixed} />
       </Switch>
     </Router>
   );

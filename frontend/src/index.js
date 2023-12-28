@@ -5,6 +5,7 @@ import Search from './Search';
 import Swap from './Swap';
 import Message from './Message';
 import Home from './Home'
+import Mixed from './Mixed'
 
 import { 
   BrowserRouter,
@@ -22,6 +23,7 @@ root.render(
     <Route path= "Swap" element = {<Swap />} />
     <Route path= "Message" element = {<Message />} />
     <Route path= "Home" element = {<Home />} />
+    <Route path= "Mixed" element = {<Mixed />} />
     <Route
       path="*"
       element={

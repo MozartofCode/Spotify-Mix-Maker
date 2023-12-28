@@ -28,7 +28,12 @@ const Deck = ({ cards }) => {
           onSwipeRight={handleSwipeRight}
         />
       ) : (
-        <p>No more cards</p>
+
+        <div>
+          <p>Finished going through the album</p>
+          <button>Send your friend your album!</button>
+        </div>
+      
       )}
     </div>
   );
