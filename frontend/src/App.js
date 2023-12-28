@@ -41,7 +41,7 @@ const App = () => {
     
   };
 
-  const handleLogin = async () => {
+  const handleLogin = async (username) => {
     // Make a POST request to login endpoint
     const response = await fetch('http://localhost:5000/api/login', {
       method: 'POST',
@@ -58,8 +58,8 @@ const App = () => {
     else {
       const data = await response.json();  
       console.log(data);
-
-      navigate('/Home');
+      
+      navigate('/Home', {state: {username: username }});
 
     }
 
@@ -78,7 +78,7 @@ const App = () => {
       </div>
       <div>
         <button onClick={handleRegister}>Register</button>
-        <button onClick={handleLogin}>Login</button>
+        <button onClick={() => handleLogin(username)}>Login</button>
       </div>
     </div>
   );

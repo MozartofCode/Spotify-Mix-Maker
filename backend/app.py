@@ -240,12 +240,13 @@ def send_request():
     data = request.json
 
     # Check if 'data' is present and has the required fields
-    if not data or 'username' not in data or 'friend' not in data or 'album' not in data:
+    if not data or 'username' not in data or 'friend' not in data or 'album' not in data or 'albumID' not in data:
         return jsonify({'error': 'Invalid request data'}), 404
 
     username = data['username']
     friend = data['friend']
-    albumID = data['album']
+    albumID = data['albumID']
+    album = data['album']
 
     # Create or access a database   
     client = connect_mongoDB()
@@ -255,12 +256,103 @@ def send_request():
     users = db["mixtapes"]
 
     # Insert the new user into the 'users' collection
-    new_user = {'username': username, 'friend': friend, 'albumID': albumID}
+    new_user = {'username': username, 'friend': friend, 'albumID': albumID, 'album': album, 'status': 'incomplete'}
     users.insert_one(new_user)
 
     return jsonify({'message': 'User registered successfully'})    
 
 
+
+@app.route('/api/displayOwnRequests', methods= ['GET'])
+def display_own_requests():
+
+    try:
+        
+        data = request.args
+
+        if not data or 'username' not in data:
+            return jsonify({'error': 'Invalid request data'}), 404
+    
+        username = data['username']
+
+        # Connect to MongoDB
+        client = connect_mongoDB()
+        db = client["users"]
+        users = db["mixtapes"]
+
+        # Retrieve requests where current_username is either 'username' or 'friend'
+        requests = list(users.find({'username': username}))
+
+        # Format the response
+        formatted_requests = []
+        for db_request in requests:
+            formatted_request = {
+                'username': db_request['username'],
+                'friend': db_request['friend'],
+                'albumID': db_request['albumID'],
+                'status': db_request['status'],
+            }
+            formatted_requests.append(formatted_request)
+
+        return jsonify(requests=formatted_requests)
+
+    except Exception as e:
+        return jsonify(error=str(e)), 500
+
+
+
+@app.route('/api/displayOtherRequests', methods= ['GET'])
+def display_other_requests():
+
+    try:
+        
+        data = request.args
+        print(data)
+        if not data or 'username' not in data:
+            return jsonify({'error': 'Invalid request data'}), 404
+    
+        username = data['username']
+
+        # Connect to MongoDB
+        client = connect_mongoDB()
+        db = client["users"]
+        users = db["mixtapes"]
+
+        requests = list(users.find({'friend': username}))
+
+        # Format the response
+        formatted_requests = []
+        for db_request in requests:
+            formatted_request = {
+                'username': db_request['username'],
+                'friend': db_request['friend'],
+                'albumID': db_request['albumID'],
+                'status': db_request['status'],
+            }
+            formatted_requests.append(formatted_request)
+
+        return jsonify(requests=formatted_requests)
+
+    except Exception as e:
+        return jsonify(error=str(e)), 500
+
+
+
+
+
+
+
+
+
+
+# Change status to complete or in progress? TODO
 @app.route('/api/acceptRequest')
 def accept_request():
     return
+
+
+@app.route('/api/rejectRequest')
+def reject_request():
+    return
+
+

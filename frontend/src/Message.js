@@ -3,8 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 const Message = () => {
 
+  const navigate = useNavigate();
   const location = useLocation();
-  const { album } = location.state || {};
+  const { albumID, album } = location.state || {};
   
   const [username, setUsername] = useState('');
   const [friend, setFriend] = useState('');
@@ -27,7 +28,8 @@ const Message = () => {
       body: JSON.stringify({
         username: username,
         friend: friend,
-        album: album,
+        albumID: albumID,
+        album: album
       }),
     });
     
@@ -39,6 +41,7 @@ const Message = () => {
 
     else {
       alert('Request send! Wait for your friend to accept...');
+      navigate('../Home')
     }
     
   };

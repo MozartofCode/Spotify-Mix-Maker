@@ -16,16 +16,16 @@ const SearchResults = ({ results }) => {
   }
 
 
-  const nextStep = async (selectedAlbumId) => {
+  const nextStep = async (selectedAlbumId, selectedAlbum) => {
 
-    navigate('/Message', { state: { album: selectedAlbumId } });
+    navigate('/Message', { state: { albumID: selectedAlbumId, album: selectedAlbum } });
   }
 
   return (
     <ul>
     {results.map((result) => (
       <li key={result.id}>
-        <button onClick={() => nextStep(result.id)} value={album}>
+        <button onClick={() => nextStep(result.id, result.name)} value={album}>
           {result.name}
         </button>
       </li>
