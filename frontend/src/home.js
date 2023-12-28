@@ -8,7 +8,7 @@ const Home = () => {
     const navigate = useNavigate();
         
     const location = useLocation();
-    const { username} = location.state || {};
+    const {username} = location.state || {};
 
 
     const navigateToSearch = () => {
@@ -53,14 +53,49 @@ const Home = () => {
     fetchOwnRequest();
   }, [username]);
 
-  const handleAccept = (albumID) => {
-    // Implement logic for accepting the request
-    console.log(`Accepted request for albumID: ${albumID}`);
+  const handleAccept = async (albumID) => {
+
+     // Make a POST request to register endpoint
+     const response = await fetch('http://localhost:5000/api/acceptRequest', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username, albumID}),
+    });
+
+    if (response.status === 400 || response.status === 404) {
+      alert("Couldn't accept request. Try again");
+    }
+
+    else {
+      alert("Request accepted...Directing to your friend's album!")  
+      navigate('../Swap');
+    }
   };
 
-  const handleReject = (albumID) => {
-    // Implement logic for rejecting the request
-    console.log(`Rejected request for albumID: ${albumID}`);
+  const handleReject = async (albumID) => {
+    
+     // Make a POST request to register endpoint
+     const response = await fetch('http://localhost:5000/api/rejectRequest', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({username, albumID}),
+    });
+
+    if (response.status === 400 || response.status === 404) {
+      alert("Couldn't reject request. Try again");
+    }
+
+    else {
+      alert("Request rejected...")
+      window.location.reload();
+    }
+
+
+
   };
 
   return (

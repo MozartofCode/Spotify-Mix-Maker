@@ -41,7 +41,7 @@ const Message = () => {
 
     else {
       alert('Request send! Wait for your friend to accept...');
-      navigate('../Home')
+      navigate('../Home', {state: {username: username }});
     }
     
   };

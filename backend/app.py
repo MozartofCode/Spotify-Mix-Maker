@@ -184,54 +184,6 @@ def search_album():
     
     except requests.RequestException as e:
         return jsonify(error = str(e)), 500
-    
-
-
-@app.route('/api/getTracks', methods= ['GET'])
-def get_track():
-    
-    data = request.args
-    
-    if not data or 'query' not in data:
-        return jsonify({'error': 'Invalid request data'}), 404
-    
-    access_token = connect_spotifyAPI()
-
-    if not access_token:
-        return jsonify({'error': 'Failed to obtain access token from Spotify API'})
-    
-    id = data['query']
-
-    spotify_search_track_url = f'https://api.spotify.com/v1/albums/{id}/tracks'
-    headers = {
-        'Authorization': f'Bearer {access_token}',
-    }
-    params = {
-        'limit': 50
-    }
-    
-    try:
-        response = requests.get(spotify_search_track_url, headers=headers, params=params)
-        response.raise_for_status()
-
-        
-        # Print request details for debugging
-        print('Request URL:', response.url)
-        print('Request Headers:', response.request.headers)
-        print('Request Params:', response.request.params)
-
-
-
-        data = response.json()
-
-        tracks = [item['name'] for item in data.get('items', [])]
-
-        return jsonify(results=tracks)
-    
-    except requests.RequestException as e:
-        return jsonify(error = str(e)), 500
-
-
 
 
 @app.route('/api/sendRequest', methods=['POST'])
@@ -307,7 +259,7 @@ def display_other_requests():
     try:
         
         data = request.args
-        print(data)
+      
         if not data or 'username' not in data:
             return jsonify({'error': 'Invalid request data'}), 404
     
@@ -318,7 +270,7 @@ def display_other_requests():
         db = client["users"]
         users = db["mixtapes"]
 
-        requests = list(users.find({'friend': username}))
+        requests = list(users.find({'friend': username, 'status': 'incomplete'}))
 
         # Format the response
         formatted_requests = []
@@ -341,18 +293,106 @@ def display_other_requests():
 
 
 
-
-
-
-
 # Change status to complete or in progress? TODO
-@app.route('/api/acceptRequest')
+@app.route('/api/acceptRequest', methods = ['POST'])
 def accept_request():
-    return
+    
+    data = request.json
+
+    # Check if 'data' is present and has the required fields
+    if not data or 'username' not in data or 'albumID' not in data:
+        return jsonify({'error': 'Invalid request data'}), 400
+
+    username = data['username']
+    albumID = data['albumID']
 
 
-@app.route('/api/rejectRequest')
+    # Create or access a database   
+    client = connect_mongoDB()
+    db = client["users"]
+    users = db["mixtapes"]
+
+    try:
+            
+        myquery = { 'friend': username, 'albumID': albumID }
+        newvalues = { "$set": { "status": "in-progress" } }
+
+        users.update_one(myquery, newvalues)
+        return jsonify({'message': 'request accepted successfully'})    
+    except:
+        return 404
+
+
+@app.route('/api/rejectRequest', methods = ['POST'])
 def reject_request():
-    return
+     
+    data = request.json
+
+    # Check if 'data' is present and has the required fields
+    if not data or 'username' not in data or 'albumID' not in data:
+        return jsonify({'error': 'Invalid request data'}), 400
+
+    username = data['username']
+    albumID = data['albumID']
 
 
+    # Create or access a database   
+    client = connect_mongoDB()
+    db = client["users"]
+    users = db["mixtapes"]
+
+    try:
+            
+        myquery = { 'friend': username, 'albumID': albumID }
+        newvalues = { "$set": { "status": "denied" } }
+
+        users.update_one(myquery, newvalues)
+        return jsonify({'message': 'request rejected successfully'})    
+    except:
+        return 404
+
+
+
+@app.route('/api/getTracks', methods= ['GET'])
+def get_track():
+    
+    data = request.args
+    
+    if not data or 'query' not in data:
+        return jsonify({'error': 'Invalid request data'}), 404
+    
+    access_token = connect_spotifyAPI()
+
+    if not access_token:
+        return jsonify({'error': 'Failed to obtain access token from Spotify API'})
+    
+    id = data['query']
+
+    spotify_search_track_url = f'https://api.spotify.com/v1/albums/{id}/tracks'
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+    }
+    params = {
+        'limit': 50
+    }
+    
+    try:
+        response = requests.get(spotify_search_track_url, headers=headers, params=params)
+        response.raise_for_status()
+
+        
+        # Print request details for debugging
+        print('Request URL:', response.url)
+        print('Request Headers:', response.request.headers)
+        print('Request Params:', response.request.params)
+
+
+
+        data = response.json()
+
+        tracks = [item['name'] for item in data.get('items', [])]
+
+        return jsonify(results=tracks)
+    
+    except requests.RequestException as e:
+        return jsonify(error = str(e)), 500
