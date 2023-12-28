@@ -70,7 +70,7 @@ const Home = () => {
 
     else {
       alert("Request accepted...Directing to your friend's album!")  
-      navigate('../Swap', {state: {albumID: albumID }});
+      navigate('../Swap', {state: {albumID: albumID, username: username }});
     }
   };
 

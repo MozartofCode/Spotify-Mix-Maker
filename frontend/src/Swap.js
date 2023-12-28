@@ -10,7 +10,7 @@ const Swap = () => {
     const navigate = useNavigate();
         
     const location = useLocation();
-    const {albumID} = location.state || {};
+    const {albumID, username} = location.state || {};
 
     // useEffect to fetch members when the component mounts
     useEffect(() => {
@@ -21,7 +21,7 @@ const Swap = () => {
     const fetchTracks = async () => {
       try {
         // Make a GET request to the backend API
-        const response = await fetch(`http://localhost:5000/api/getTracks?query=${albumID}`, {
+        const response = await fetch(`http://localhost:5000/api/getTracks?query=${albumID}&username=${username}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -38,6 +38,8 @@ const Swap = () => {
             name: track.name, 
             artist: track.artist,
             imageSrc: track.imageURL, 
+            username: track.username,
+            albumID: track.albumID
           }));
   
           // Update the state with the new cards and clear any previous errors

@@ -6,12 +6,12 @@ const Deck = ({ cards }) => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const handleSwipeLeft = ({ name, party }) => {
+  const handleSwipeLeft = ({ name, artist}) => {
     setCurrentIndex((prevIndex) => prevIndex + 1);
 
   };
 
-  const handleSwipeRight = ({ name, party }) => {
+  const handleSwipeRight = ({ name, artist }) => {
     setCurrentIndex((prevIndex) => prevIndex + 1);
   };
 
@@ -22,6 +22,8 @@ const Deck = ({ cards }) => {
           name={cards[currentIndex].name}
           artist={cards[currentIndex].artist}
           imageSrc={cards[currentIndex].imageSrc}
+          albumID={cards[currentIndex].albumID}
+          username={cards[currentIndex].username}
           onSwipeLeft={handleSwipeLeft}
           onSwipeRight={handleSwipeRight}
         />

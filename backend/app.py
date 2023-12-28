@@ -208,7 +208,7 @@ def send_request():
     users = db["mixtapes"]
 
     # Insert the new user into the 'users' collection
-    new_user = {'username': username, 'friend': friend, 'albumID': albumID, 'album': album, 'status': 'incomplete'}
+    new_user = {'username': username, 'friend': friend, 'albumID': albumID, 'album': album, 'status': 'incomplete', 'likedSongs': []}
     users.insert_one(new_user)
 
     return jsonify({'message': 'User registered successfully'})    
@@ -352,13 +352,12 @@ def reject_request():
         return 404
 
 
-
 @app.route('/api/getTracks', methods= ['GET'])
-def get_track():
+def get_tracks():
     
     data = request.args
     
-    if not data or 'query' not in data:
+    if not data or 'query' not in data or 'username' not in data:
         return jsonify({'error': 'Invalid request data'}), 404
     
     access_token = connect_spotifyAPI()
@@ -366,9 +365,10 @@ def get_track():
     if not access_token:
         return jsonify({'error': 'Failed to obtain access token from Spotify API'})
     
-    id = data['query']
+    album_id = data['query']
+    username = data['username']
 
-    spotify_search_track_url = f'https://api.spotify.com/v1/albums/{id}/tracks'
+    spotify_search_track_url = f'https://api.spotify.com/v1/albums/{album_id}/tracks'
     headers = {
         'Authorization': f'Bearer {access_token}',
     }
@@ -414,7 +414,9 @@ def get_track():
                 'id': count,
                 'name': item['name'],
                 'artist': ', '.join([artist['name'] for artist in item.get('artists', [])]),
-                'imageURL': imageURL
+                'imageURL': imageURL,
+                'username': username,
+                'albumID': album_id
             }
 
             tracks.append(track_info)
@@ -424,3 +426,44 @@ def get_track():
     
     except requests.RequestException as e:
         return jsonify(error = str(e)), 500
+
+
+
+
+@app.route('/api/swipeRight', methods= ['POST'])
+def swipe_right():
+
+    data = request.json
+    print(data)
+    # Check if 'data' is present and has the required fields
+    if not data or 'username' not in data or 'name' not in data or 'albumID' not in data:
+       
+        return jsonify({'error': 'Invalid request data'}), 400
+
+    username = data['username']
+    track_name = data['name']
+    album_id = data['albumID']
+
+    # Create or access a database   
+    client = connect_mongoDB()
+    db = client["users"]
+    users = db["mixtapes"]
+
+    try:
+        myquery = { 'friend': username, 'albumID': album_id }
+        newvalues = {
+            "$set": {"status": "Completed"},
+            "$push": {"likedSongs": track_name}
+        }
+        
+        users.update_one(myquery, newvalues)
+        
+        return jsonify({'message': 'swiped right successfully'}), 200
+        
+    except:
+        return jsonify({'error': 'swiped right unsuccessful'}), 404
+
+
+
+
+
