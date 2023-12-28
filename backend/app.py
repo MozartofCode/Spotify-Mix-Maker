@@ -380,19 +380,47 @@ def get_track():
         response = requests.get(spotify_search_track_url, headers=headers, params=params)
         response.raise_for_status()
 
-        
-        # Print request details for debugging
-        print('Request URL:', response.url)
-        print('Request Headers:', response.request.headers)
-        print('Request Params:', response.request.params)
-
-
-
         data = response.json()
 
-        tracks = [item['name'] for item in data.get('items', [])]
+        tracks = []
+        count = 1
 
-        return jsonify(results=tracks)
+        for item in data.get('items', []):
+
+            query = item['name']
+
+            spotify_search_url = 'https://api.spotify.com/v1/search'
+            headers = {
+                'Authorization': f'Bearer {access_token}',
+            }
+            params = {
+                'q': query,
+                'type': 'track',
+                'limit': 1
+            }
+                
+            response = requests.get(spotify_search_url, headers=headers, params=params)
+            response.raise_for_status()
+            data = response.json()
+
+             # Check if there are tracks in the response
+            items = data.get('tracks', {}).get('items', [])
+            
+            if items:
+                # Extract the image URL of the first track
+                imageURL = items[0]['album']['images'][0]['url'] if items[0]['album']['images'] else None
+                
+                track_info = {
+                'id': count,
+                'name': item['name'],
+                'artist': ', '.join([artist['name'] for artist in item.get('artists', [])]),
+                'imageURL': imageURL
+            }
+
+            tracks.append(track_info)
+            count += 1
+            
+        return jsonify(tracks)
     
     except requests.RequestException as e:
         return jsonify(error = str(e)), 500
