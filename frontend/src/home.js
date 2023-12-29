@@ -21,11 +21,11 @@ const Home = () => {
 
     const fetchCompletedRequest = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/displayCompleted?username=${username}`);
+        const response = await fetch(`http://localhost:5000/api/displayCompletedRequests?username=${username}`);
         const data = await response.json();
 
         if (response.ok) {
-          setOwnRequests(data.requests);
+          setCompletedRequests(data.requests);
         } else {
           console.error('Failed to fetch requests:', data.error);
         }
@@ -172,9 +172,10 @@ const Home = () => {
       <ul>
         {completedRequests.map((request, index) => (
             <li key={index}>
-              <p>Friend: {request.username}</p>
+              <p>Friend: {request.friend}</p>
               <p>Status: {request.status}</p>
-              <p>Songs: {request.likedSongs}</p>
+              <p>Songs: {request.likedSongs.join(', ')}</p>
+
               <button onClick={() => makeMixList(request.username, request.friend, request.likedSongs)}>Make my mix list!</button>
               
             </li>

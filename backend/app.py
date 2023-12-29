@@ -307,8 +307,8 @@ def display_completed():
         db = client["users"]
         users = db["mixtapes"]
 
-        friend_requests = list(users.find({'friend': username, 'status': 'complete'}))
-        own_requests = list(users.find({'username': username, 'status': 'complete'}))
+        friend_requests = list(users.find({'friend': username, 'status': 'Completed'}))
+        own_requests = list(users.find({'username': username, 'status': 'Completed'}))
 
         formatted_requests = []        
 
@@ -319,7 +319,7 @@ def display_completed():
                     'username': own_req['username'],
                     'friend': own_req['friend'],
                     'status': own_req['status'],
-                    'likedSong': own_req['likedSongs'] + friend_req['likedSongs'],
+                    'likedSongs': own_req['likedSongs'] + friend_req['likedSongs'],
                     }
                     
                     formatted_requests.append(formatted_request)
