@@ -1,8 +1,23 @@
 import Deck from './Deck';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import GlobalSstyle from './GlobalStyles';
+
 
 const Swap = () => {
+
+  const basicStyle = {
+    backgroundColor: 'pink',
+    padding: '10px',
+    border: '1px solid',
+    width: '355px',
+    fontWeight: 'bold',
+    fontSize: '20px',
+    marginTop: '20px',
+    textAlign: 'center',
+    margin: '0 auto',
+  }
+
 
     const [cards, setCards] = useState([]);
     const [error, setError] = useState(''); // Initialize the error state
@@ -60,8 +75,9 @@ const Swap = () => {
 
     return(    
         <div>
-        <h1>Which songs do you like?</h1>
+        <h1 style = {basicStyle}>Which songs do you like?</h1>
         <Deck cards={cards} />
+        <GlobalSstyle />
     </div>
     );
 };

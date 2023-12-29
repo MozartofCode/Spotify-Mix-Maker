@@ -1,8 +1,62 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import GlobalStyle from './GlobalStyles';
 
 const Home = () => {
     
+    
+  const headerStyle = {
+    backgroundColor: 'pink',
+    padding: '10px',
+    border: '1px solid',
+    width: '355px',
+    fontWeight: 'bold',
+    fontSize: '20px',
+    marginTop: '20px',
+    textAlign: 'center'
+  };
+
+  const listStyle = {
+    backgroundColor: '#ADD8E6',
+    border: '1px solid',
+    width: '355px',
+    fontWeight: 'bold',
+    fontSize: '15px',
+    marginTop: '20px',
+    textAlign: 'center'
+  };
+
+
+  const mixButton = {
+    border: '5px solid white',
+    fontWeight: 'bold',
+    fontSize: '15px',
+    marginTop: '-4px',
+    textAlign: 'center'
+  }
+
+
+  const searchButton = {
+    border: '5px solid white',
+    fontWeight: 'bold',
+    fontSize: '15px',
+    marginTop: '20px',
+    textAlign: 'center'
+  }
+
+  const otherButtons = {
+    border: '5px solid white',
+    fontWeight: 'bold',
+    fontSize: '15px',
+    marginTop: '5px',
+    textAlign: 'center',
+    marginLeft: '10px',
+    marginRight: '10px',   
+    marginBottom: '10px'
+  }
+
+
+
     const [requests, setRequests] = useState([]);
     const [ownRequests, setOwnRequests] = useState([]);
     const [completedRequests, setCompletedRequests] = useState([]);
@@ -118,52 +172,31 @@ const Home = () => {
 
   const makeMixList = async (username, friend, likedSongs) => {
     
-      // Make a POST request to register endpoint
-      const response = await fetch('http://localhost:5000/api/makeMixList', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({username, friend, likedSongs}),
-      });
-  
-      if (response.status === 404) {
-        alert("Something went bad! 404 Error...");
-      }
-
-      else if (response.status === 400) {
-        alert("Couldn't make playlist. Try again");
-      }
-  
-      else {
-        navigate('../Mixed', {state: {username: username, friend: friend, likedSongs: likedSongs}});
-        alert("Congratulations! New Playlist has been created for you and your friend");
-      }
+    navigate('../Mixed', {state: {username: username, friend: friend, likedSongs: likedSongs}});
+    alert("Congratulations! New Playlist has been created for you and your friend");
+      
   };
     
 
-
-
-
   return (
     <div>
-      <h2>Incoming Requests For You</h2>
+      <h2 style={headerStyle}>Incoming Requests For You</h2>
       <ul>
         {requests.map((request, index) => (
-          <li key={index}>
+          <li style={listStyle} key={index}>
             <p>Requesting Friend: {request.username}</p>
             <p>Status: {request.status}</p>
-            <button onClick={() => handleAccept(request.albumID)}>Accept</button>
-            <button onClick={() => handleReject(request.albumID)}>Reject</button>
+            <button style = {otherButtons} onClick={() => handleAccept(request.albumID)}>Accept</button>
+            <button style = {otherButtons} onClick={() => handleReject(request.albumID)}>Reject</button>
           </li>
         ))}
       </ul>
 
-      <h2>In-progress Requests Sent by You</h2>
+      <h2 style={headerStyle}>In-progress Requests Sent by You</h2>
 
       <ul>
         {ownRequests.map((request, index) => (
-          <li key={index}>
+          <li style={listStyle} key={index}>
             <p>The Friend You Requested to: {request.friend}</p>
             <p>Status: {request.status}</p>
           </li>
@@ -171,27 +204,24 @@ const Home = () => {
       </ul>
         
         
-      <h2>Lists Ready for creating a mixed playlist!</h2>
+      <h2 style={headerStyle}>Lists Ready for creating a mixed playlist!</h2>
 
       <ul>
         {completedRequests.map((request, index) => (
-            <li key={index}>
+            <li style={listStyle} key={index}>
               <p>Friend: {request.friend}</p>
               <p>Status: {request.status}</p>
               <p>Songs: {request.likedSongs.join(', ')}</p>
 
-              <button onClick={() => makeMixList(request.username, request.friend, request.likedSongs)}>Make my mix list!</button>
+              <button style = {mixButton} onClick={() => makeMixList(request.username, request.friend, request.likedSongs)}>Make my mix list!</button>
               
             </li>
           ))}
       </ul>
-
-
-
       
-      <button onClick={navigateToSearch}>Create a New Request</button>
+      <button style = {searchButton} onClick={navigateToSearch}>Create a New Request</button>
 
-
+      <GlobalStyle />
     </div>
   );
 

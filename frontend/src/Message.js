@@ -1,7 +1,47 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import GlobalStyles from './GlobalStyles'
 
 const Message = () => {
+
+  
+  // Styles for header and page
+  const headerStyle = { 
+  backgroundColor: 'pink',
+  padding: '10px',
+  border: '1px solid',
+  width: '500px',
+  fontWeight: 'bold',
+  fontSize: '20px',
+  marginTop: '180px',
+  textAlign: 'center',
+  margin:'auto'
+  };
+
+  
+  const textStyle = {
+    padding: '5px',
+    fontSize: '15px',
+    marginTop: '5px',
+    fontWeight: 'bold',
+    marginLeft: '2px',
+    textAlign: 'left',
+  }
+
+  const buttonStyle = {
+      backgroundColor: '',
+      padding: '5px',
+      fontWeight: 'bold',
+      marginTop: '10px',
+      marginLeft: '40px',
+      marginBottom: '10px',
+      textAlign: 'center',
+  }
+
+
+
+
+
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -48,20 +88,20 @@ const Message = () => {
 
 
   return (
-    <div>
-      <h2>Message Component</h2>
+    <div style={headerStyle}>
+      <h2>Send Your Request</h2>
       <div>
         <label>Your Username:</label>
-        <input type="text" value={username} onChange={handleUsernameChange} />
+        <input style = {textStyle} type="text" value={username} onChange={handleUsernameChange} />
       </div>
       <div>
-        <label>Your Friend's Username:</label>
-        <input type="text" value={friend} onChange={handleFriendChange} />
+        <label>Friend's Username:</label>
+        <input  style = {textStyle} type="text" value={friend} onChange={handleFriendChange} />
       </div>
       <div>
-        <button onClick={handleSubmission}>Send Request</button>
+        <button style = {buttonStyle} onClick={handleSubmission}>Send Request</button>
       </div>
-      
+      <GlobalStyles />
     </div>
   );
 };

@@ -3,6 +3,12 @@ import React, { useState } from 'react';
 
 
 const SearchBox = ({ onSearch }) => {
+  
+  const boxStyle = {
+    marginLeft: '5px',
+  };
+  
+  
   const [query, setQuery] = useState('');
 
   const handleSearch = async () => {
@@ -33,7 +39,7 @@ const SearchBox = ({ onSearch }) => {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
-      <button onClick={handleSearch}>Search</button>
+      <button style = {boxStyle} onClick={handleSearch}>Search</button>
     </div>
   );
 };
