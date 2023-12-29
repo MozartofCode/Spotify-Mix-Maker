@@ -14,14 +14,15 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import certifi
 import json
+from urllib.parse import urlencode
 
 # Create a Flask app
 app = Flask(__name__)
 CORS(app)
 
 # Credentials for Spotify
-client_id = "1451cdd63e324f46ac0db9da993cfb58"
-client_secret = "55ee865120cf4a9689727db6b80ebb3a"
+client_id = "32abb917973440c2909581705bca9842"
+client_secret = "6bc8efafa4584c6fac51ba4131b2d261"
 
 # Credentials for MangoDB
 mongo_username = "newMangoUser"
@@ -29,6 +30,23 @@ mongo_password = "MkqL4Dw0gOvQIC88"
 mongo_cluster = "spotify-mix-cluster"
 
 
+
+def get_authorization_url():
+    auth_url = 'https://accounts.spotify.com/authorize'
+
+    # Scopes define the access permissions
+    scopes = ['user-read-private', 'user-read-email']
+
+    params = {
+        'client_id': client_id,
+        'response_type': 'code',
+        'redirect_uri': redirect_uri,
+        'scope': ' '.join(scopes),
+    }
+
+    authorization_url = f'{auth_url}?{urlencode(params)}'
+
+    return authorization_url
 
 
 def connect_spotifyAPI():
@@ -53,7 +71,6 @@ def connect_spotifyAPI():
     else:
         print(f'Error: {response.status_code}')
         print(response.text)
-
 
 
 
@@ -501,155 +518,3 @@ def swipe_right():
     except:
         return jsonify({'error': 'swiped right unsuccessful'}), 404
 
-
-
-@app.route('/api/makeMixList', methods = ['POST'])
-def make_mixed_List():
-    
-    data = request.json
-    
-    # Check if 'data' is present and has the required fields
-    if not data or 'username' not in data or 'friend' not in data or 'likedSongs' not in data:
-        return jsonify({'error': 'Invalid request data'}), 400
-
-    username = data['username']
-    friend = data['friend']
-    songs = data['likedSongs']
-
-    access_token = connect_spotifyAPI()
-
-    if not access_token:
-        return jsonify({'error': 'Failed to obtain access token from Spotify API'})
-    
-    
-    # 1- Find the Spotify URIs of all the liked Songs
-    
-    spotify_uris = []
-
-    try:
-        for song in songs:
-        
-            spotify_search_url = 'https://api.spotify.com/v1/search'
-
-            headers = {
-                'Authorization': f'Bearer {access_token}',
-            }
-            
-            params = {
-                'q': song,
-                'type': 'track',
-                'limit': 1
-            }
-                    
-            response = requests.get(spotify_search_url, headers=headers, params=params)
-            response.raise_for_status()
-            data = response.json()
-
-            # Check if there are tracks in the response
-            items = data.get('tracks', {}).get('items', [])
-                
-            for item in items:
-                uri = item['uri']
-                spotify_uris.append(uri)
-    except:
-        print("track error")
-        return jsonify({'error':'Couldnt get the uris for tracks'}), 404
-    
-
-    # 2- Create playlist (for both username and friend)
-
-    
-    print("STEP 2")
-
-
-    # User ID for the current profile
-    spotify_user_id = ""
-
-    try:
-
-        # Spotify API endpoint for getting current user's profile
-        me_endpoint = 'https://api.spotify.com/v1/me'
-
-        # Set up headers with the access token
-        headers = {
-            'Authorization': f'Bearer {access_token}',
-        }
-
-        # Make GET request to get current user's profile
-        response = requests.get(me_endpoint, headers=headers)
-
-        # Check if the request was successful (status code 200)
-        print(response.status_code)
-        
-        if response.status_code == 200:
-            user_info = response.json()
-            spotify_user_id = user_info['id']
-        else:
-            return jsonify({'error': 'Couldnt get the user id'}), 404
-    except:
-            return jsonify({'error': 'Couldnt get the user id'}), 404
-    
-    print("STEP 3")
-
-
-    try:
-            
-        create_playlist_url = f'https://api.spotify.com/v1/users/{spotify_user_id}/playlists'
-
-        # Playlist data
-        playlist_data = {
-            'name': username + ' and ' + friend + "'s Playlist" ,
-            'public': True,  # Set to False for a private playlist
-            'collaborative': False,
-            'description': 'This is the pplaylist created by the Spotify Mix Maker for' + username + ' and ' + friend,
-        }
-
-        # Create playlist
-        response = requests.post(create_playlist_url, headers=headers, json=playlist_data)
-
-        # Check if the request was successful (status code 201)
-
-        playlist_id = ""
-
-        if response.status_code == 201:
-            playlist_info = response.json()
-            playlist_id = playlist_info['id']
-            print(f'Playlist created successfully! Playlist ID: {playlist_id}')
-        else:
-            return jsonify(f'Error creating playlist. Status code: {response.status_code}, Response: {response.text}'), 404
-    except:
-            return jsonify(f'Error creating playlist. Status code: {response.status_code}, Response: {response.text}'), 404
-
-    # 3- Add the songs to playlist
-
-    print("STEP 4")
-
-
-    try:
-            
-        # Spotify API endpoint for adding tracks to a playlist
-        add_tracks_endpoint = f'https://api.spotify.com/v1/playlists/{playlist_id}/tracks'
-
-        # Set up headers with the access token
-        headers = {
-            'Authorization': f'Bearer {access_token}',
-            'Content-Type': 'application/json',
-        }
-
-        # Request body
-        request_body = {
-            'uris': spotify_uris
-        }
-
-        # Make POST request to add tracks to the playlist
-        response = requests.post(add_tracks_endpoint, headers=headers, json=request_body)
-
-        # Check if the request was successful (status code 201)
-        if response.status_code == 201:
-            snapshot_id = response.json().get('snapshot_id')
-            print(f'Tracks added to the playlist successfully. Snapshot ID: {snapshot_id}')
-            return jsonify(f'Tracks added to the playlist successfully. Snapshot ID: {snapshot_id}'), 201
-        else:
-            return jsonify(f'Error adding tracks to the playlist. Status code: {response.status_code}, Response: {response.text}'), 404
-    except:
-            return jsonify(f'Error adding tracks to the playlist. Status code: {response.status_code}, Response: {response.text}'), 404
