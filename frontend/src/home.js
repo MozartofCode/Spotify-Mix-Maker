@@ -127,7 +127,11 @@ const Home = () => {
         body: JSON.stringify({username, friend, likedSongs}),
       });
   
-      if (response.status === 400 || response.status === 404) {
+      if (response.status === 404) {
+        alert("Something went bad! 404 Error...");
+      }
+
+      else if (response.status === 400) {
         alert("Couldn't make playlist. Try again");
       }
   
