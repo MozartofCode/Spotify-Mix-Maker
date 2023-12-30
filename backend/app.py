@@ -1,7 +1,8 @@
-# @Author: Bertan Berker
-# Uses Spotify API to create a mix of music backend
-# Makes the necessary requests to the mongodb database
-
+# @ Author: Bertan Berker
+# @ Language: Python - Flask framework
+# This is the backend for the web application spotify-mix-maker
+# The backend makes calls to the Spotify API to search for albums and songs and
+# It creates users and mixtapes stores them in a mongoDB database
 
 # Import necessary modules
 import requests
@@ -11,44 +12,25 @@ from flask_cors import CORS
 import base64
 from pymongo import MongoClient
 from pymongo.mongo_client import MongoClient
-from pymongo.server_api import ServerApi
 import certifi
-import json
-from urllib.parse import urlencode
 
 # Create a Flask app
 app = Flask(__name__)
 CORS(app)
 
-# Credentials for Spotify
-client_id = "32abb917973440c2909581705bca9842"
-client_secret = "6bc8efafa4584c6fac51ba4131b2d261"
+# Credentials for Spotify API
+client_id = ""
+client_secret = ""
 
-# Credentials for MangoDB
-mongo_username = "newMangoUser"
-mongo_password = "MkqL4Dw0gOvQIC88"
-mongo_cluster = "spotify-mix-cluster"
-
-
-
-def get_authorization_url():
-    auth_url = 'https://accounts.spotify.com/authorize'
-
-    # Scopes define the access permissions
-    scopes = ['user-read-private', 'user-read-email']
-
-    params = {
-        'client_id': client_id,
-        'response_type': 'code',
-        'redirect_uri': redirect_uri,
-        'scope': ' '.join(scopes),
-    }
-
-    authorization_url = f'{auth_url}?{urlencode(params)}'
-
-    return authorization_url
+# Credentials for MangoDB connection
+mongo_username = ""
+mongo_password = ""
+mongo_cluster = ""
 
 
+# This function uses the client_id and client_secret to get an access token for future API calls to the Spotify API
+# :parameters: None
+# :return: returns access token for API calls
 def connect_spotifyAPI():
 
     auth_url = 'https://accounts.spotify.com/api/token'
@@ -73,8 +55,9 @@ def connect_spotifyAPI():
         print(response.text)
 
 
-
-
+# This function uses the mongo username, password and cluster to connect to MongoDB
+# :parameters: None
+# :return: returns client
 def connect_mongoDB():
     
     uri = "mongodb+srv://" + mongo_username + ":" + mongo_password + "@" + mongo_cluster + ".i73vml1.mongodb.net/?retryWrites=true&w=majority"
@@ -92,13 +75,14 @@ def connect_mongoDB():
         print(e)
 
 
+# This function handles the login of a user and checks the database to make sure
+# :parameters: JSON data containing 'username', 'password'
+# :return: JSON response containing success or failure message
 @app.route('/api/login', methods=['POST'])
 def login():
     
-    # Extract username and password from the request body
     data = request.json
 
-    # Check if 'data' is present and has the required fields
     if not data or 'username' not in data or 'password' not in data:
         return jsonify({'error': 'Invalid request data'}), 400
 
@@ -107,12 +91,8 @@ def login():
 
     client = connect_mongoDB()
 
-    # Create or access a database
     db = client["users"]
-
-    # Create or access a collection
     users = db["users"]
-
 
     # Check if the username already exists
     existing_user = users.find_one({'username': username, 'password': password})
@@ -123,8 +103,9 @@ def login():
     return jsonify({'message': "User doesn't exist or incorrrect credentials"}), 400
 
 
-
-
+# This function handles the registration of a user and adds them to the database
+# :parameters: JSON data containing 'username', 'password'
+# :return: JSON response containing success or failure message
 @app.route('/api/register', methods=['POST'])
 def register():
     
@@ -138,16 +119,10 @@ def register():
     username = data['username']
     password = data['password']
 
-
-    # Create or access a database   
-
     client = connect_mongoDB()
 
     db = client["users"]
-
-    # Create or access a collection
     users = db["users"]
-
 
     # Check if the username already exists
     existing_user = users.find_one({'username': username, 'password': password})
@@ -162,7 +137,9 @@ def register():
     return jsonify({'message': 'User registered successfully'})    
 
 
-
+# This function calls the Spotify API to search for an album based on keywords
+# :parameters: JSON data containing 'query'
+# :return: JSON response containing album's based on the keywords
 @app.route('/api/search', methods = ['GET'])
 def search_album():
     
@@ -203,6 +180,9 @@ def search_album():
         return jsonify(error = str(e)), 500
 
 
+# This function handles sending a request
+# :parameters: JSON data containing 'username', 'friend', 'album' and 'albumID'
+# :return: JSON response containing success or failure
 @app.route('/api/sendRequest', methods=['POST'])
 def send_request():
 
@@ -231,12 +211,14 @@ def send_request():
     return jsonify({'message': 'User registered successfully'})    
 
 
-
+# This function displays the requests the user themselves created
+# :parameters: JSON data containing 'username'
+# :return: JSON response containing own requests
 @app.route('/api/displayOwnRequests', methods= ['GET'])
 def display_own_requests():
 
     try:
-        
+
         data = request.args
 
         if not data or 'username' not in data:
@@ -269,7 +251,9 @@ def display_own_requests():
         return jsonify(error=str(e)), 500
 
 
-
+# This function displays the other requests
+# :parameters: JSON data containing 'username'
+# :return: JSON response containing other requests
 @app.route('/api/displayOtherRequests', methods= ['GET'])
 def display_other_requests():
 
@@ -306,7 +290,9 @@ def display_other_requests():
         return jsonify(error=str(e)), 500
 
 
-
+# This function displays the completed requests
+# :parameters: JSON data containing 'username'
+# :return: JSON response containing completed requests
 @app.route('/api/displayCompletedRequests', methods= ['GET'])
 def display_completed():
 
@@ -347,8 +333,9 @@ def display_completed():
         return jsonify(error=str(e)), 500
 
 
-
-# Change status to complete or in progress? TODO
+# This function handles the user accepting a mixtape request.
+# :parameters: JSON data containing 'username' and 'albumID'.
+# :return: JSON response indicating success or failure of the operation.
 @app.route('/api/acceptRequest', methods = ['POST'])
 def accept_request():
     
@@ -378,6 +365,9 @@ def accept_request():
         return 404
 
 
+# This function handles the user rejecting a mixtape request.
+# :parameters: JSON data containing 'username' and 'albumID'.
+# :return: JSON response indicating success or failure of the operation.
 @app.route('/api/rejectRequest', methods = ['POST'])
 def reject_request():
      
@@ -407,6 +397,9 @@ def reject_request():
         return 404
 
 
+# This function retrieves the tracks from an album.
+# :parameters: Query parameters containing 'username' and 'albumID'.
+# :return: JSON response containing information about tracks from the album.
 @app.route('/api/getTracks', methods= ['GET'])
 def get_tracks():
     
@@ -483,8 +476,9 @@ def get_tracks():
         return jsonify(error = str(e)), 500
 
 
-
-
+# This function handles the user swiping right on a track in a mixtape.
+# :parameters: JSON data containing 'username', 'name' (track name), and 'albumID'.
+# :return: JSON response indicating success or failure of the operation.
 @app.route('/api/swipeRight', methods= ['POST'])
 def swipe_right():
 
@@ -512,9 +506,7 @@ def swipe_right():
         }
         
         users.update_one(myquery, newvalues)
-        
         return jsonify({'message': 'swiped right successfully'}), 200
         
     except:
         return jsonify({'error': 'swiped right unsuccessful'}), 404
-
