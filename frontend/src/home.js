@@ -204,7 +204,7 @@ const Home = () => {
       </ul>
         
         
-      <h2 style={headerStyle}>Lists Ready for creating a mixed playlist!</h2>
+      <h2 style={headerStyle}>Lists Ready for Creating a Mixed Playlist!</h2>
 
       <ul>
         {completedRequests.map((request, index) => (

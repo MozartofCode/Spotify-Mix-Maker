@@ -19,17 +19,6 @@ const Search = ({ results }) => {
     margin:'auto'
   };
 
-  const paragraphStyle = {
-    backgroundColor: 'grey',
-    padding: '10px',
-    border: '1px solid',
-    width: '500px',
-    fontWeight: 'bold',
-    fontSize: '20px',
-    marginTop: '80px',
-    textAlign: 'left',
-    margin:'auto'
-  };
 
   const [searchResults, setSearchResults] = useState([]);
 
