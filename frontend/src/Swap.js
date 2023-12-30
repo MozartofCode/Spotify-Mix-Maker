@@ -18,11 +18,8 @@ const Swap = () => {
     margin: '0 auto',
   }
 
-
     const [cards, setCards] = useState([]);
     const [error, setError] = useState(''); // Initialize the error state
-    
-    const navigate = useNavigate();
         
     const location = useLocation();
     const {albumID, username} = location.state || {};
@@ -71,7 +68,6 @@ const Swap = () => {
         setError('Error fetching tracks');
       }
     };
-  
 
     return(    
         <div>
@@ -81,6 +77,5 @@ const Swap = () => {
     </div>
     );
 };
-
 
 export default Swap;

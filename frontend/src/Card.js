@@ -1,9 +1,10 @@
 import React from 'react';
 
+// Card component for displaying album information and swipe buttons
 const Card = ({ albumID, username, name, artist, imageSrc, onSwipeLeft, onSwipeRight }) => {
 
-   // Styles for the buttons
-   const buttonStyle = {
+  // Styles for the buttons
+  const buttonStyle = {
     backgroundColor: '#1899D6',
     borderRadius: '16px',
     borderWidth: '0 0 4px',
@@ -75,6 +76,7 @@ const Card = ({ albumID, username, name, artist, imageSrc, onSwipeLeft, onSwipeR
     width: '300px'
   };
 
+  // Styles for the paragraph container
   const paragraphStyle = {
     backgroundColor: '#ADD8E6',
     padding: '10px', // Adjust the padding as needed
@@ -86,9 +88,7 @@ const Card = ({ albumID, username, name, artist, imageSrc, onSwipeLeft, onSwipeR
     margin: 'auto'
   }
 
-
-
-
+  // Event handler for swiping left
   const handleSwipeLeft = () => {
     if (name && artist) {
       onSwipeLeft({ name, artist });
@@ -97,9 +97,10 @@ const Card = ({ albumID, username, name, artist, imageSrc, onSwipeLeft, onSwipeR
     }
   };
 
+  // Event handler for swiping right
   const handleSwipeRight = async () => {
     
-    // Make a POST request to login endpoint
+    // Make a POST request to swipeRight endpoint
     const response = await fetch('http://localhost:5000/api/swipeRight', {
       method: 'POST',
       headers: {
@@ -108,19 +109,19 @@ const Card = ({ albumID, username, name, artist, imageSrc, onSwipeLeft, onSwipeR
       body: JSON.stringify({ username, name, albumID }),
     });
 
+    // Handle different response statuses
     if (response.status === 404 || response.status === 400) {
       alert("Couldn't swipe Right! Error! Try again...");
-    }
-
-    else {
+    } else {
       const data = await response.json();  
-      console.log("Success in swiping right")
+      console.log("Success in swiping right");
       if (name && artist) {
         onSwipeRight({ name, artist });
       }
     };
   }
 
+  // Rendered JSX
   return (
     <div>
       <div style={paragraphStyle}>
@@ -132,8 +133,10 @@ const Card = ({ albumID, username, name, artist, imageSrc, onSwipeLeft, onSwipeR
       <div />
       
       <div>
-        <button style={buttonStyle} className="swipe-left" onClick={() => handleSwipeLeft(name, artist)}> No </button>
-        <button style = {buttonStyle2} className="swipe-right" onClick={() => handleSwipeRight(name, artist)}> Yes </button>
+        {/* Button for swiping left */}
+        <button style={buttonStyle} className="swipe-left" onClick={handleSwipeLeft}> No </button>
+        {/* Button for swiping right */}
+        <button style={buttonStyle2} className="swipe-right" onClick={handleSwipeRight}> Yes </button>
       </div>
     </div>
   );

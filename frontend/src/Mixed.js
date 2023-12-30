@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import GlobalService from './GlobalStyles';
 
+// Functional component representing the Mixed page
 const Mixed = () => {
     
-  
+  // Styles for header and page
   const headerStyle = {
     backgroundColor: 'pink',
     padding: '10px',
@@ -25,23 +26,23 @@ const Mixed = () => {
     fontSize: '20px',
     marginTop: '20px',
     textAlign: 'left',
-    margin:'auto'
+    margin: 'auto'
   };
 
-
+  // Hooks for navigation and location
   const navigate = useNavigate();
   const location = useLocation();
   const { username, friend, likedSongs } = location.state || {};
 
   return (
     <div style={headerStyle}>
-      <h2 >{username} and {friend}'s Playlist!</h2>
+      <h2>{username} and {friend}'s Playlist!</h2>
       
       <ul style={paragraphStyle}>
         {likedSongs.map((song, index) => (
-            <li key={index}>
-              <p>{song}</p>
-            </li>
+          <li key={index}>
+            <p>{song}</p>
+          </li>
         ))}
       </ul>
       
@@ -51,8 +52,6 @@ const Mixed = () => {
       <GlobalService />
     </div>
   );
-  
-}
-
+};
 
 export default Mixed;

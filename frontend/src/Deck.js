@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
-import Card from './Card';
+import Card from './Card';  // Importing the Card component
 import { useNavigate } from 'react-router-dom';
 
 // Functional component representing the deck of cards
 const Deck = ({ cards }) => {
 
-  
   // Styles for the deck
   const deckStyle = {
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: '10px',
     marginTop: '5px',
-  
   };
 
   const buttonStyle = {
@@ -34,16 +32,15 @@ const Deck = ({ cards }) => {
     margin: 'auto'
   }
 
-
-
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);  // State to track the current index of the card
   const navigate = useNavigate();
 
-  const handleSwipeLeft = ({ name, artist}) => {
+  // Event handler for swiping left
+  const handleSwipeLeft = ({ name, artist }) => {
     setCurrentIndex((prevIndex) => prevIndex + 1);
-
   };
 
+  // Event handler for swiping right
   const handleSwipeRight = ({ name, artist }) => {
     setCurrentIndex((prevIndex) => prevIndex + 1);
   };
@@ -51,6 +48,7 @@ const Deck = ({ cards }) => {
   return (
     <div style={deckStyle}>
       {currentIndex < cards.length && cards.length > 0 ? (
+        // Render the Card component with the current card information
         <Card
           name={cards[currentIndex].name}
           artist={cards[currentIndex].artist}
@@ -61,12 +59,11 @@ const Deck = ({ cards }) => {
           onSwipeRight={handleSwipeRight}
         />
       ) : (
-
+        // Render a message when all cards have been swiped
         <div style={paragraphStyle}>
           <p>Finished going through the album!</p>
-          <button style = {buttonStyle} onClick={() => navigate('../Search')}>Make a request to send your friend your album!</button>
+          <button style={buttonStyle} onClick={() => navigate('../Search')}>Make a request to send your friend your album!</button>
         </div>
-      
       )}
     </div>
   );

@@ -1,8 +1,8 @@
 // src/Routes.js
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import App from './App'; // Import your main App component
-import Search from './Search'; // Import your home component
+import App from './App';
+import Search from './Search'; 
 import Message from './Message'
 import Home from './Home'
 import Swap from './Swap'
